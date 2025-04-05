@@ -84,7 +84,7 @@ while (task.wait()) do
 		local humanoid = target and target:FindFirstChild('Humanoid')
 
 		if (root and humanoid) then
-			moveto(CFrame.new(positions[settings.mission_type]), settings.tweenSpeed)
+			moveTo(CFrame.new(positions[settings.mission_type]), settings.tweenSpeed)
 			game:GetService("ReplicatedStorage").DamageEvent:FireServer(nil, humanoid, '&@&*&@&', target)
 		end
 	end
