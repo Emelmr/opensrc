@@ -82,8 +82,6 @@ while task.wait() do
 	if game.PlaceId == 6372960231 then
 		moveto(CFrame.new(positions[settings.mission_type]), settings.tween_speed)
 
-		if settings.mission_type == "mission" then
-			game:GetService("ReplicatedStorage").Remotes.VotedMapEvent:FireServer(1)
 		end
 	else
 		local target = getTitan()
