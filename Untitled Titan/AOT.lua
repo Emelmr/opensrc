@@ -1,15 +1,15 @@
--- @leadmarker 
+-- @leadmarker
 
-if (not game:IsLoaded()) then 
+if (not game:IsLoaded()) then
 	task.wait()
 end
 
--- Services 
+-- Services
 local players = game:GetService('Players')
 local tweenservice = game:GetService('TweenService')
 
 -- Variables
-local client = players.LocalPlayer 
+local client = players.LocalPlayer
 local positions = { mission = Vector3.new(1, 1, 235), wave = Vector3.new(234, 1, -1) }
 
 -- Functions
@@ -25,7 +25,8 @@ local function moveto(Target, TeleportSpeed)
 	local StartTime = tick();
 	local TotalDuration = (StartingPosition - Target).magnitude / TeleportSpeed;
 
-	repeat game:GetService("RunService").Heartbeat:Wait();
+	repeat
+		game:GetService("RunService").Heartbeat:Wait();
 		local Delta = tick() - StartTime;
 		local Progress = math.min(Delta / TotalDuration, 1);
 		local MappedPosition = StartingPosition + (PositionDelta * Progress);
@@ -37,23 +38,23 @@ local function moveto(Target, TeleportSpeed)
 end
 
 local function get_titan()
-	local titan = nil 
-	local dist = math.huge 
+	local titan = nil
+	local dist = math.huge
 
-	for i, v in pairs(workspace.Entities.Titans:GetChildren()) do 
-		if (v:IsA('Model')) then 
+	for i, v in pairs(workspace.Entities.Titans:GetChildren()) do
+		if (v:IsA('Model')) then
 			local root = v and v:FindFirstChild('HumanoidRootPart')
 			local humanoid = v and v:FindFirstChild('Humanoid')
 
-			local char = client.Character 
+			local char = client.Character
 			local my_root = char and char:FindFirstChild('HumanoidRootPart')
 
-			if (root and humanoid and my_root) then 
-				local mag = (my_root.Position - root.Position).magnitude 
-				if (mag > dist) then continue end 
-
-				titan = v 
-				dist = mag 
+			if (root and humanoid and my_root) then
+				local mag = (my_root.Position - root.Position).magnitude
+				if (mag < dist) then
+					titan = v
+					dist = mag
+				end
 			end
 		end
 	end
@@ -61,23 +62,28 @@ local function get_titan()
 	return titan
 end
 
-for i,v in pairs(getconnections(client.Idled)) do 
-	v:Disable() 
+-- Disable idle detection
+for i, v in pairs(getconnections(client.Idled)) do
+	if v.Disable then
+		v:Disable()
+	else
+		warn("Connection does not have a Disable method")
+	end
 end
 
-while (task.wait()) do 
-	if (game.PlaceId == 6372960231) then 
+while (task.wait()) do
+	if (game.PlaceId == 6372960231) then
 		moveto(CFrame.new(positions[settings.mission_type]), settings.tween_speed)
 
-		if (settings.mission_type == 'mission') then 
+		if (settings.mission_type == 'mission') then
 			game:GetService("ReplicatedStorage").Remotes.VotedMapEvent:FireServer(1)
 		end
-	else 
+	else
 		local target = get_titan()
 		local root = target and target:FindFirstChild('HumanoidRootPart')
 		local humanoid = target and target:FindFirstChild('Humanoid')
 
-		if (root and humanoid) then 
+		if (root and humanoid) then
 			moveto(root.CFrame * CFrame.new(0, 0, 5), settings.tween_speed)
 			game:GetService("ReplicatedStorage").DamageEvent:FireServer(nil, humanoid, '&@&*&@&', target)
 		end
