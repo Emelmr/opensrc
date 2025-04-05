@@ -1,57 +1,64 @@
 -- @leadmarker
 
-if (not game:IsLoaded()) then
+if not game:IsLoaded() then
 	task.wait()
 end
 
 -- Services
 local players = game:GetService('Players')
-local tweenservice = game:GetService('TweenService')
+local tweenService = game:GetService('TweenService')
 
 -- Variables
 local client = players.LocalPlayer
-local positions = { mission = Vector3.new(1, 1, 235), wave = Vector3.new(234, 1, -1) }
+local positions = {
+	mission = Vector3.new(1, 1, 235),
+	wave = Vector3.new(234, 1, -1)
+}
 
 -- Functions
-local function moveto(Target, TeleportSpeed)
-	if (typeof(Target) == "Instance" and Target:IsA("BasePart")) then Target = Target.Position; end;
-	if (typeof(Target) == "CFrame") then Target = Target.p end;
+local function moveto(Target, tweenSpeed)
+	if typeof(Target) == "Instance" and Target:IsA("BasePart") then
+		Target = Target.Position
+	end
+	if typeof(Target) == "CFrame" then
+		Target = Target.p
+	end
 
-	local HRP = (client.Character and client.Character:FindFirstChild("HumanoidRootPart"));
-	if (not HRP) then return; end;
+	local HRP = client.Character and client.Character:FindFirstChild("HumanoidRootPart")
+	if not HRP then return end
 
-	local StartingPosition = HRP.Position;
-	local PositionDelta = (Target - StartingPosition);
-	local StartTime = tick();
-	local TotalDuration = (StartingPosition - Target).magnitude / TeleportSpeed;
+	local startingPosition = HRP.Position
+	local positionDelta = (Target - startingPosition)
+	local startTime = tick()
+	local totalDuration = (startingPosition - Target).magnitude / tweenSpeed
 
 	repeat
-		game:GetService("RunService").Heartbeat:Wait();
-		local Delta = tick() - StartTime;
-		local Progress = math.min(Delta / TotalDuration, 1);
-		local MappedPosition = StartingPosition + (PositionDelta * Progress);
-		HRP.Velocity = Vector3.new();
-		HRP.CFrame = CFrame.new(MappedPosition);
-	until (HRP.Position - Target).magnitude <= TeleportSpeed / 2000;
-	HRP.Anchored = false;
-	HRP.CFrame = CFrame.new(Target);
+		game:GetService("RunService").Heartbeat:Wait()
+		local delta = tick() - startTime
+		local progress = math.min(delta / totalDuration, 1)
+		local mappedPosition = startingPosition + (positionDelta * progress)
+		HRP.Velocity = Vector3.new()
+		HRP.CFrame = CFrame.new(mappedPosition)
+	until (HRP.Position - Target).magnitude <= tweenSpeed / 2000
+	HRP.Anchored = false
+	HRP.CFrame = CFrame.new(Target)
 end
 
-local function get_titan()
+local function getTitan()
 	local titan = nil
 	local dist = math.huge
 
-	for i, v in pairs(workspace.Entities.Titans:GetChildren()) do
-		if (v:IsA('Model')) then
-			local root = v and v:FindFirstChild('HumanoidRootPart')
-			local humanoid = v and v:FindFirstChild('Humanoid')
+	for _, v in pairs(workspace.Entities.Titans:GetChildren()) do
+		if v:IsA('Model') then
+			local root = v:FindFirstChild('HumanoidRootPart')
+			local humanoid = v:FindFirstChild('Humanoid')
 
 			local char = client.Character
-			local my_root = char and char:FindFirstChild('HumanoidRootPart')
+			local myRoot = char:FindFirstChild('HumanoidRootPart')
 
-			if (root and humanoid and my_root) then
-				local mag = (my_root.Position - root.Position).magnitude
-				if (mag < dist) then
+			if root and humanoid and myRoot then
+				local mag = (myRoot.Position - root.Position).magnitude
+				if mag < dist then
 					titan = v
 					dist = mag
 				end
@@ -63,7 +70,7 @@ local function get_titan()
 end
 
 -- Disable idle detection
-for i, v in pairs(getconnections(client.Idled)) do
+for _, v in pairs(getconnections(client.Idled)) do
 	if v.Disable then
 		v:Disable()
 	else
@@ -71,20 +78,20 @@ for i, v in pairs(getconnections(client.Idled)) do
 	end
 end
 
-while (task.wait()) do
-	if (game.PlaceId == 6372960231) then
+while task.wait() do
+	if game.PlaceId == 6372960231 then
 		moveto(CFrame.new(positions[settings.mission_type]), settings.tween_speed)
 
-		if (settings.mission_type == 'mission') then
+		if settings.mission_type == "mission" then
 			game:GetService("ReplicatedStorage").Remotes.VotedMapEvent:FireServer(1)
 		end
 	else
-		local target = get_titan()
+		local target = getTitan()
 		local root = target and target:FindFirstChild('HumanoidRootPart')
 		local humanoid = target and target:FindFirstChild('Humanoid')
 
-		if (root and humanoid) then
-			moveTo(CFrame.new(positions[settings.mission_type]), settings.tweenSpeed)
+		if root and humanoid then
+			moveto(CFrame.new(positions[settings.mission_type]), settings.tween_speed)
 			game:GetService("ReplicatedStorage").DamageEvent:FireServer(nil, humanoid, '&@&*&@&', target)
 		end
 	end
