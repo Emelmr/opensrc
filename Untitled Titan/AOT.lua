@@ -43,7 +43,7 @@ local function moveto(Target, TeleportSpeed)
 		local MappedPosition = StartingPosition + (PositionDelta * Progress)
 		HRP.Velocity = Vector3.zero
 		HRP.CFrame = CFrame.new(MappedPosition)
-	until (HRP.Position - Target).Magnitude <= TeleportSpeed / 2000
+	until (HRP.Position - Target).Magnitude <= TeleportSpeed / 1000
 
 	HRP.Anchored = false
 	HRP.CFrame = CFrame.new(Target)
