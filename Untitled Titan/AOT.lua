@@ -17,7 +17,7 @@ local positions = { mission = Vector3.new(1, 1, 235), wave = Vector3.new(234, 1,
 
 -- Settings (set these!)
 local settings = {
-	mission_type = "mission", -- or "wave"
+	mission_type = "wave", -- or "mission"
 	tween_speed = 1000
 }
 
@@ -83,7 +83,7 @@ end
 while task.wait() do 
 	if game.PlaceId == 6372960231 then 
 		moveto(CFrame.new(positions[settings.mission_type]), settings.tween_speed)
-		if settings.mission_type == "mission" then 
+		if settings.mission_type == "wave" then 
 			replicated.Remotes.VotedMapEvent:FireServer(1)
 		end
 	else
