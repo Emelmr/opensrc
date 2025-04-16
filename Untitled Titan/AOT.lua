@@ -18,7 +18,7 @@ local positions = { mission = Vector3.new(1, 1, 235), wave = Vector3.new(234, 1,
 -- Settings (set these!)
 local settings = {
 	mission_type = "mission", -- or "wave"
-	tween_speed = 2000
+	tween_speed = 1000
 }
 
 -- Functions
